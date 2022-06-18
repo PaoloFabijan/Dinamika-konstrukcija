@@ -36,8 +36,8 @@ TB_acc = data["TB_acc"]
 
 a_g = np.zeros([len(data), 1])
 a_g[:, 0] = TB_acc
-a_g = a_g.transpose() * 0.001 # Ubrzanja stola B
-x_g = (a_g * 0.01**2) * 0.001 # Pomaci stola B
+a_g = a_g.transpose() # Ubrzanja stola B
+x_g = (a_g * 0.01**2) # Pomaci stola B
 
 # Import podataka iz ispitivanja (test 3)
 exp_data = np.genfromtxt("test3.csv", delimiter=",", names=("Time", "M1", "M2", "M3", "TA", "TB"))
@@ -69,9 +69,9 @@ v = np.zeros([8,n])
 a = np.zeros([8,n])
 
 # Pocetni uvjeti:
-x[1,0] = m1[1] # Pomak mase 1
-x[3,0] = m2[1] # Pomak mase 2
-x[5,0] = m3[1] # Pomak mase 3
+x[1,0] = m1[0] # Pomak mase 1
+x[3,0] = m2[0] # Pomak mase 2
+x[5,0] = m3[0] # Pomak mase 3
 a[:,0] = np.dot(inv(M), (np.dot(-C, v[:,0]) + np.dot(-K, x[:,0])))
 
 # Efektivna matrica krutosti (konstantna je):
@@ -100,9 +100,9 @@ for i in range(n-1):
 plt.plot(t, m2, "r") # Dijagram pomaka za masu 2 (Eksperiment)
 # plt.plot(t, m3, "r") # Dijagram pomaka za masu 3 (Eksperiment)
 
-# plt.plot(t, x[1,:], "r") # Dijagram pomaka za masu 1 (Python)
-plt.plot(t, x[3,:], "g") # Dijagram pomaka za masu 2 (Python)
-# plt.plot(t, x[5,:], "b") # Dijagram pomaka za masu 3 (Python)
+# plt.plot(t, -x[1,:]*1000, "g") # Dijagram pomaka za masu 1 (Python)
+plt.plot(t, -x[3,:]*1000, "g") # Dijagram pomaka za masu 2 (Python)
+# plt.plot(t, -x[5,:]*1000, "b") # Dijagram pomaka za masu 3 (Python)
 plt.plot([0, t[-1]],[0, 0], 'k--')
 plt.legend(['masa 1', 'masa 2', 'masa 3'], loc ="lower right")
 plt.xlabel('Vrijeme t (s)')
@@ -121,4 +121,4 @@ plt.ylabel('Pomak x (mm)')
 # plt.plot(L1+L2, x[3,loc], "ro")
 # plt.plot(L1+2*L2, x[5,loc], "ro")
 
-# plt.show()
+plt.show()
