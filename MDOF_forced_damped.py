@@ -23,29 +23,30 @@ phi_2 = v[:,1]
 phi_3 = v[:,2]
 
 # Koeficijent prigušenja
-zeta = 0.045611
+zeta = 0.45611
 a0 = zeta * ((2*omega[0] * omega[1])/(omega[0] + omega[1]))
 a1 = zeta * (2/(omega[0] + omega[1]))
 
 # Matrica prigušenja
 C = a0*M + a1*K
 
-# Ubrzanja i pomaci stola B
+# Ubrzanja stola B
 data = np.genfromtxt("Ubrzanja.txt", names = ("TB_acc"))
 TB_acc = data["TB_acc"]
 
-# a_g = np.zeros([len(data), 1])
 a_g = TB_acc * 0.001
-a_g = a_g.transpose() # Ubrzanja stola B
-x_g = (a_g * 0.01**2) # Pomaci stola B
+a_g = a_g.transpose()
 
 # Import podataka iz ispitivanja (test 3)
-exp_data = np.genfromtxt("test3.csv", delimiter=",", names=("Time", "M1", "M2", "M3", "TA", "TB"))
-m1 = exp_data["M1"] * 0.001
-m2 = exp_data["M2"] * 0.001
-m3 = exp_data["M3"] * 0.001
-ta = exp_data["TA"] * 0.001
-tb = exp_data["TB"] * 0.001
+exp_data = np.genfromtxt("test3.csv", delimiter=",", names=("Time", "M1", "M2", "M3", "TA", "TB"), missing_values = None, filling_values = 0.0)
+m1 = exp_data["M1"]
+m2 = exp_data["M2"]
+m3 = exp_data["M3"]
+ta = exp_data["TA"]
+tb = exp_data["TB"]
+
+# Pomaci stola B
+x_g = tb.transpose() * 0.001
 
 # Rjesavanje jednadzbe kretanja
 t_end = 39.81
@@ -69,9 +70,9 @@ v = np.zeros([8,n])
 a = np.zeros([8,n])
 
 # Pocetni uvjeti:
-x[1,0] = m1[0] # Pomak mase 1
-x[3,0] = m2[0] # Pomak mase 2
-x[5,0] = m3[0] # Pomak mase 3
+x[1,0] = m1[0] * 0.001 # Pomak mase 1 u [m]
+x[3,0] = m2[0] * 0.001 # Pomak mase 2 u [m]
+x[5,0] = m3[0] * 0.001 # Pomak mase 3 u [m]
 a[:,0] = np.dot(inv(M), (np.dot(-C, v[:,0]) + np.dot(-K, x[:,0])))
 
 # Efektivna matrica krutosti (konstantna je):
@@ -97,9 +98,9 @@ for i in range(n-1):
     a[:,i+1] = b1*(x[:,i+1] - x[:,i]) + b2*v[:,i] + b3*a[:,i]
 
 # CRTANJE GRAFOVA  
-# plt.plot(t, m1*1000, "r") # Dijagram pomaka za masu 1 (Eksperiment)
-plt.plot(t, m2*1000, "r") # Dijagram pomaka za masu 2 (Eksperiment)
-# plt.plot(t, m3*1000, "r") # Dijagram pomaka za masu 3 (Eksperiment)
+# plt.plot(t, m1, "r") # Dijagram pomaka za masu 1 (Eksperiment)
+plt.plot(t, m2, "r") # Dijagram pomaka za masu 2 (Eksperiment)
+# plt.plot(t, m3, "r") # Dijagram pomaka za masu 3 (Eksperiment)
 
 # plt.plot(t, -x[1,:]*1000, "g") # Dijagram pomaka za masu 1 (Python)
 plt.plot(t, -x[3,:]*1000, "g") # Dijagram pomaka za masu 2 (Python)
