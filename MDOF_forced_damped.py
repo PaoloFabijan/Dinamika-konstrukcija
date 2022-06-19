@@ -34,23 +34,23 @@ C = a0*M + a1*K
 data = np.genfromtxt("Ubrzanja.txt", names = ("TB_acc"))
 TB_acc = data["TB_acc"]
 
-a_g = np.zeros([len(data), 1])
-a_g[:, 0] = TB_acc
+# a_g = np.zeros([len(data), 1])
+a_g = TB_acc * 0.001
 a_g = a_g.transpose() # Ubrzanja stola B
 x_g = (a_g * 0.01**2) # Pomaci stola B
 
 # Import podataka iz ispitivanja (test 3)
 exp_data = np.genfromtxt("test3.csv", delimiter=",", names=("Time", "M1", "M2", "M3", "TA", "TB"))
-m1 = exp_data["M1"]
-m2 = exp_data["M2"]
-m3 = exp_data["M3"]
-ta = exp_data["TA"]
-tb = exp_data["TB"]
+m1 = exp_data["M1"] * 0.001
+m2 = exp_data["M2"] * 0.001
+m3 = exp_data["M3"] * 0.001
+ta = exp_data["TA"] * 0.001
+tb = exp_data["TB"] * 0.001
 
 # Rjesavanje jednadzbe kretanja
 t_end = 39.81
 dt = 0.01
-n = len(a_g[0])
+n = 3982
 # n = int(t_end/dt)
 
 # Newmarkovi parametri
@@ -83,7 +83,8 @@ for i in range(n-1):
     t[i+1] = (i+1)*dt
 
     # Vektor vanjskog opterećenja
-    F = np.dot(-M, (np.array([0, 1/6, 0, 1/2, 0, 5/6, 0, 0]) * x_g[:,i]))
+    e = (np.array([0, 1/6, 0, 1/2, 0, 5/6, 0, 0])).transpose() * x_g[i]
+    F = np.dot((np.dot(-M, e)), a_g[i])
     
     # Efektivni vektor opterecenja (mijenja se u svakom trenutku):
     F_eff = F + np.dot(M, (b1*x[:,i] - b2*v[:,i] - b3*a[:,i])) + np.dot(C, (b4*x[:,i] - b5*v[:,i] - b6*a[:,i]))
@@ -96,9 +97,9 @@ for i in range(n-1):
     a[:,i+1] = b1*(x[:,i+1] - x[:,i]) + b2*v[:,i] + b3*a[:,i]
 
 # CRTANJE GRAFOVA  
-# plt.plot(t, m1, "r") # Dijagram pomaka za masu 1 (Eksperiment)
-plt.plot(t, m2, "r") # Dijagram pomaka za masu 2 (Eksperiment)
-# plt.plot(t, m3, "r") # Dijagram pomaka za masu 3 (Eksperiment)
+# plt.plot(t, m1*1000, "r") # Dijagram pomaka za masu 1 (Eksperiment)
+plt.plot(t, m2*1000, "r") # Dijagram pomaka za masu 2 (Eksperiment)
+# plt.plot(t, m3*1000, "r") # Dijagram pomaka za masu 3 (Eksperiment)
 
 # plt.plot(t, -x[1,:]*1000, "g") # Dijagram pomaka za masu 1 (Python)
 plt.plot(t, -x[3,:]*1000, "g") # Dijagram pomaka za masu 2 (Python)
@@ -122,3 +123,5 @@ plt.ylabel('Pomak x (mm)')
 # plt.plot(L1+2*L2, x[5,loc], "ro")
 
 plt.show()
+
+# print(np.dot(K_eff_inv, F_eff))
